@@ -1,5 +1,6 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash
 from datetime import datetime
 
 app = Flask(__name__)
@@ -20,6 +21,34 @@ class User(db.Model):
 @app.route("/")
 def home():
     return render_template("index.html")
+
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        name = request.form["name"].strip()
+        email = request.form["email"].strip().lower()
+        password = request.form["password"]
+
+        if not name or not email or len(password) < 6:
+            flash("Fill all fields. Password needs at least 6 characters.")
+            return redirect(url_for("register"))
+
+        if User.query.filter_by(email=email).first():
+            flash("This email is already registered.")
+            return redirect(url_for("register"))
+
+        user = User(
+            name=name,
+            email=email,
+            password_hash=generate_password_hash(password),
+        )
+        db.session.add(user)
+        db.session.commit()
+        flash("Account created successfully!")
+        return redirect(url_for("register"))
+
+    return render_template("register.html")
 
 
 if __name__ == "__main__":
