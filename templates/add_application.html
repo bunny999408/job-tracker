@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Add Job Application</h1>
+<form method="POST">
+  <p><input type="text" name="company" placeholder="Company" required></p>
+  <p><input type="text" name="role" placeholder="Role (e.g. Python Developer)" required></p>
+  <p><input type="url" name="job_link" placeholder="Job link (optional)"></p>
+  <p>
+    <select name="source">
+      <option>LinkedIn</option>
+      <option>Naukri</option>
+      <option>Company website</option>
+      <option>Referral</option>
+      <option>Other</option>
+    </select>
+  </p>
+  <p>
+    <select name="status">
+      <option>Applied</option>
+      <option>Test</option>
+      <option>Interview</option>
+      <option>Offer</option>
+      <option>Rejected</option>
+    </select>
+  </p>
+  <p>Follow-up date: <input type="date" name="follow_up_date"></p>
+  <p><textarea name="notes" placeholder="Notes (optional)"></textarea></p>
+  <p><button type="submit">Save</button></p>
+</form>
+{% endblock %}

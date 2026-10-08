@@ -5,7 +5,7 @@ from flask_login import (
     login_required, current_user,
 )
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
+from datetime import datetime, date
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "change-this-later"
@@ -23,6 +23,19 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class Application(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    company = db.Column(db.String(150), nullable=False)
+    role = db.Column(db.String(150), nullable=False)
+    job_link = db.Column(db.String(300))
+    source = db.Column(db.String(50))
+    status = db.Column(db.String(30), default="Applied")
+    applied_date = db.Column(db.Date, default=date.today)
+    follow_up_date = db.Column(db.Date)
+    notes = db.Column(db.Text)
 
 
 @login_manager.user_loader
@@ -79,11 +92,45 @@ def login():
 
     return render_template("login.html")
 
-
 @app.route("/dashboard")
 @login_required
 def dashboard():
-    return render_template("dashboard.html")
+    applications = (
+        Application.query.filter_by(user_id=current_user.id)
+        .order_by(Application.applied_date.desc())
+        .all()
+    )
+    return render_template("dashboard.html", applications=applications)
+
+
+@app.route("/applications/add", methods=["GET", "POST"])
+@login_required
+def add_application():
+    if request.method == "POST":
+        company = request.form["company"].strip()
+        role = request.form["role"].strip()
+        if not company or not role:
+            flash("Company and role are required.")
+            return redirect(url_for("add_application"))
+
+        follow_up = request.form.get("follow_up_date")
+        application = Application(
+            user_id=current_user.id,
+            company=company,
+            role=role,
+            job_link=request.form.get("job_link", "").strip(),
+            source=request.form.get("source", "").strip(),
+            status=request.form.get("status", "Applied"),
+            follow_up_date=date.fromisoformat(follow_up) if follow_up else None,
+            notes=request.form.get("notes", "").strip(),
+        )
+        db.session.add(application)
+        db.session.commit()
+        flash("Application added!")
+        return redirect(url_for("dashboard"))
+
+    return render_template("add_application.html")
+
 
 
 @app.route("/logout")

@@ -2,5 +2,28 @@
 
 {% block content %}
 <h1>Welcome, {{ current_user.name }}!</h1>
-<p>Your job applications will appear here soon.</p>
+<p><a href="{{ url_for('add_application') }}">+ Add application</a></p>
+
+{% if applications %}
+<table border="1" cellpadding="6">
+  <tr>
+    <th>Company</th>
+    <th>Role</th>
+    <th>Status</th>
+    <th>Applied</th>
+    <th>Follow up</th>
+  </tr>
+  {% for app in applications %}
+  <tr>
+    <td>{{ app.company }}</td>
+    <td>{{ app.role }}</td>
+    <td>{{ app.status }}</td>
+    <td>{{ app.applied_date }}</td>
+    <td>{{ app.follow_up_date or "-" }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<p>No applications yet. Add your first one!</p>
+{% endif %}
 {% endblock %}
