@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import (
     LoginManager, UserMixin, login_user, logout_user,
@@ -131,6 +131,49 @@ def add_application():
 
     return render_template("add_application.html")
 
+
+@app.route("/applications/<int:app_id>/edit", methods=["GET", "POST"])
+@login_required
+def edit_application(app_id):
+    application = db.session.get(Application, app_id)
+    if application is None or application.user_id != current_user.id:
+        abort(404)
+
+    if request.method == "POST":
+        company = request.form["company"].strip()
+        role = request.form["role"].strip()
+        if not company or not role:
+            flash("Company and role are required.")
+            return redirect(url_for("edit_application", app_id=app_id))
+
+        follow_up = request.form.get("follow_up_date")
+        application.company = company
+        application.role = role
+        application.job_link = request.form.get("job_link", "").strip()
+        application.source = request.form.get("source", "").strip()
+        application.status = request.form.get("status", "Applied")
+        application.follow_up_date = (
+            date.fromisoformat(follow_up) if follow_up else None
+        )
+        application.notes = request.form.get("notes", "").strip()
+        db.session.commit()
+        flash("Application updated!")
+        return redirect(url_for("dashboard"))
+
+    return render_template("edit_application.html", application=application)
+
+
+@app.route("/applications/<int:app_id>/delete", methods=["POST"])
+@login_required
+def delete_application(app_id):
+    application = db.session.get(Application, app_id)
+    if application is None or application.user_id != current_user.id:
+        abort(404)
+
+    db.session.delete(application)
+    db.session.commit()
+    flash("Application deleted.")
+    return redirect(url_for("dashboard"))
 
 
 @app.route("/logout")

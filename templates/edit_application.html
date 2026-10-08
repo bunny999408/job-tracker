@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Edit Application</h1>
+<form method="POST">
+  <p><input type="text" name="company" value="{{ application.company }}" required></p>
+  <p><input type="text" name="role" value="{{ application.role }}" required></p>
+  <p><input type="url" name="job_link" value="{{ application.job_link or '' }}" placeholder="Job link (optional)"></p>
+  <p>
+    <select name="source">
+      {% for s in ["LinkedIn", "Naukri", "Company website", "Referral", "Other"] %}
+        <option {% if application.source == s %}selected{% endif %}>{{ s }}</option>
+      {% endfor %}
+    </select>
+  </p>
+  <p>
+    <select name="status">
+      {% for s in ["Applied", "Test", "Interview", "Offer", "Rejected"] %}
+        <option {% if application.status == s %}selected{% endif %}>{{ s }}</option>
+      {% endfor %}
+    </select>
+  </p>
+  <p>Follow-up date:
+    <input type="date" name="follow_up_date" value="{{ application.follow_up_date or '' }}">
+  </p>
+  <p><textarea name="notes" placeholder="Notes (optional)">{{ application.notes or '' }}</textarea></p>
+  <p><button type="submit">Update</button> <a href="{{ url_for('dashboard') }}">Cancel</a></p>
+</form>
+{% endblock %}
