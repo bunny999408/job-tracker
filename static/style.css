@@ -1,0 +1,168 @@
+:root {
+  --bg: #f4f6fb;
+  --card: #ffffff;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --primary: #4f46e5;
+  --primary-dark: #4338ca;
+  --border: #e5e7eb;
+  --danger: #dc2626;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: linear-gradient(135deg, #eef2ff 0%, #f4f6fb 50%, #e0f2fe 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+
+nav {
+  background: var(--primary);
+  padding: 12px 20px;
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+nav a { color: #fff; text-decoration: none; font-weight: bold; }
+nav a:hover { text-decoration: underline; }
+
+.container {
+  max-width: 1000px;
+  margin: 20px auto;
+  padding: 0 16px;
+}
+
+h1, h2 { margin: 16px 0 8px; }
+
+.flash {
+  background: #e0e7ff;
+  border-left: 4px solid var(--primary);
+  padding: 10px 14px;
+  border-radius: 6px;
+  margin: 12px 0;
+}
+
+/* Forms */
+form input[type="text"],
+form input[type="email"],
+form input[type="password"],
+form input[type="url"],
+form input[type="date"],
+form select,
+form textarea {
+  width: 100%;
+  max-width: 420px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 16px;
+  background: #fff;
+}
+form textarea { min-height: 90px; }
+
+button {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 15px;
+  cursor: pointer;
+}
+button:hover { background: var(--primary-dark); }
+button.danger { background: var(--danger); }
+button.danger:hover { background: #b91c1c; }
+
+a { color: var(--primary); }
+
+/* Summary cards */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 12px;
+  margin: 12px 0 20px;
+}
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  text-align: center;
+}
+.card .number { font-size: 28px; font-weight: bold; }
+.card .label { color: var(--muted); font-size: 14px; }
+
+/* Follow-up box */
+.followup {
+  background: #fff7ed;
+  border: 1px solid #fdba74;
+  border-radius: 10px;
+  padding: 10px 16px;
+  margin-bottom: 20px;
+}
+
+/* Filter bar */
+.filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
+.filters input, .filters select { width: auto !important; flex: 1 1 160px; }
+
+/* Table */
+.table-wrap { overflow-x: auto; background: var(--card); border: 1px solid var(--border); border-radius: 10px; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+th { background: #f9fafb; font-size: 14px; color: var(--muted); }
+tr:last-child td { border-bottom: none; }
+
+/* Status badges */
+.badge { padding: 3px 10px; border-radius: 999px; font-size: 13px; font-weight: bold; }
+.badge.applied { background: #dbeafe; color: #1d4ed8; }
+.badge.test { background: #fef3c7; color: #b45309; }
+.badge.interview { background: #ede9fe; color: #6d28d9; }
+.badge.offer { background: #dcfce7; color: #15803d; }
+.badge.rejected { background: #fee2e2; color: #b91c1c; }
+
+.actions { display: flex; gap: 10px; align-items: center; }
+.actions form { margin: 0; }
+
+/* Smooth fade-in when a page loads */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.container { animation: fadeUp 0.4s ease; }
+
+/* Summary cards lift when you hover */
+.card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+}
+
+/* Buttons feel responsive */
+button { transition: background 0.2s ease, transform 0.1s ease; }
+button:active { transform: scale(0.97); }
+
+/* Table rows highlight on hover */
+tr { transition: background 0.15s ease; }
+tbody tr:hover, tr:hover td { background: #f9fafb; }
+
+/* Nav links */
+nav a { transition: opacity 0.2s ease; }
+nav a:hover { opacity: 0.8; text-decoration: none; }
+
+/* Flash messages slide in */
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.flash { animation: slideIn 0.3s ease; }
+
+/* Respect users who turn animations off */
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}

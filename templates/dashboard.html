@@ -2,28 +2,31 @@
 
 {% block content %}
 <h1>Welcome, {{ current_user.name }}!</h1>
-<p><a href="{{ url_for('add_application') }}">+ Add application</a></p>
+<p><a href="{{ url_for('add_application') }}"><button type="button">+ Add application</button></a></p>
 
-<h2>Summary</h2>
-<p>
-  Total: {{ total }}
-  {% for s in statuses %} | {{ s }}: {{ counts[s] }}{% endfor %}
-</p>
+<div class="cards">
+  <div class="card"><div class="number">{{ total }}</div><div class="label">Total</div></div>
+  {% for s in statuses %}
+  <div class="card"><div class="number">{{ counts[s] }}</div><div class="label">{{ s }}</div></div>
+  {% endfor %}
+</div>
 
 {% if due %}
-<h2>Follow up today</h2>
-<ul>
-  {% for a in due %}
-  <li>
-    {{ a.company }} - {{ a.role }} (follow-up date: {{ a.follow_up_date }})
-    <a href="{{ url_for('edit_application', app_id=a.id) }}">Edit</a>
-  </li>
-  {% endfor %}
-</ul>
+<div class="followup">
+  <h2>Follow up today</h2>
+  <ul>
+    {% for a in due %}
+    <li>
+      {{ a.company }} - {{ a.role }} (due {{ a.follow_up_date }})
+      <a href="{{ url_for('edit_application', app_id=a.id) }}">Edit</a>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
 {% endif %}
 
 <h2>Your applications</h2>
-<form method="GET">
+<form method="GET" class="filters">
   <input type="text" name="q" value="{{ q }}" placeholder="Search company or role">
   <select name="status">
     <option value="">All statuses</option>
@@ -36,32 +39,36 @@
 </form>
 
 {% if applications %}
-<table border="1" cellpadding="6">
-  <tr>
-    <th>Company</th>
-    <th>Role</th>
-    <th>Status</th>
-    <th>Applied</th>
-    <th>Follow up</th>
-    <th>Actions</th>
-  </tr>
-  {% for a in applications %}
-  <tr>
-    <td>{{ a.company }}</td>
-    <td>{{ a.role }}</td>
-    <td>{{ a.status }}</td>
-    <td>{{ a.applied_date }}</td>
-    <td>{{ a.follow_up_date or "-" }}</td>
-    <td>
-      <a href="{{ url_for('edit_application', app_id=a.id) }}">Edit</a>
-      <form method="POST" action="{{ url_for('delete_application', app_id=a.id) }}"
-            style="display:inline" onsubmit="return confirm('Delete this application?');">
-        <button type="submit">Delete</button>
-      </form>
-    </td>
-  </tr>
-  {% endfor %}
-</table>
+<div class="table-wrap">
+  <table>
+    <tr>
+      <th>Company</th>
+      <th>Role</th>
+      <th>Status</th>
+      <th>Applied</th>
+      <th>Follow up</th>
+      <th>Actions</th>
+    </tr>
+    {% for a in applications %}
+    <tr>
+      <td>{{ a.company }}</td>
+      <td>{{ a.role }}</td>
+      <td><span class="badge {{ a.status|lower }}">{{ a.status }}</span></td>
+      <td>{{ a.applied_date }}</td>
+      <td>{{ a.follow_up_date or "-" }}</td>
+      <td>
+        <div class="actions">
+          <a href="{{ url_for('edit_application', app_id=a.id) }}">Edit</a>
+          <form method="POST" action="{{ url_for('delete_application', app_id=a.id) }}"
+                onsubmit="return confirm('Delete this application?');">
+            <button type="submit" class="danger">Delete</button>
+          </form>
+        </div>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
 {% else %}
 <p>No applications found.</p>
 {% endif %}
