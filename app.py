@@ -92,15 +92,55 @@ def login():
 
     return render_template("login.html")
 
+
+STATUSES = ["Applied", "Test", "Interview", "Offer", "Rejected"]
+
+
 @app.route("/dashboard")
 @login_required
 def dashboard():
-    applications = (
-        Application.query.filter_by(user_id=current_user.id)
-        .order_by(Application.applied_date.desc())
+    q = request.args.get("q", "").strip()
+    selected_status = request.args.get("status", "").strip()
+
+    query = Application.query.filter_by(user_id=current_user.id)
+    if q:
+        query = query.filter(
+            db.or_(
+                Application.company.ilike(f"%{q}%"),
+                Application.role.ilike(f"%{q}%"),
+            )
+        )
+    if selected_status:
+        query = query.filter_by(status=selected_status)
+    applications = query.order_by(Application.applied_date.desc()).all()
+
+    counts = {
+        s: Application.query.filter_by(user_id=current_user.id, status=s).count()
+        for s in STATUSES
+    }
+    total = Application.query.filter_by(user_id=current_user.id).count()
+
+    due = (
+        Application.query.filter(
+            Application.user_id == current_user.id,
+            Application.follow_up_date.isnot(None),
+            Application.follow_up_date <= date.today(),
+            Application.status.notin_(["Offer", "Rejected"]),
+        )
+        .order_by(Application.follow_up_date)
         .all()
     )
-    return render_template("dashboard.html", applications=applications)
+
+    return render_template(
+        "dashboard.html",
+        applications=applications,
+        statuses=STATUSES,
+        counts=counts,
+        total=total,
+        due=due,
+        q=q,
+        selected_status=selected_status,
+    )
 
 
 @app.route("/applications/add", methods=["GET", "POST"])

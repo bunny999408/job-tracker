@@ -4,6 +4,37 @@
 <h1>Welcome, {{ current_user.name }}!</h1>
 <p><a href="{{ url_for('add_application') }}">+ Add application</a></p>
 
+<h2>Summary</h2>
+<p>
+  Total: {{ total }}
+  {% for s in statuses %} | {{ s }}: {{ counts[s] }}{% endfor %}
+</p>
+
+{% if due %}
+<h2>Follow up today</h2>
+<ul>
+  {% for a in due %}
+  <li>
+    {{ a.company }} - {{ a.role }} (follow-up date: {{ a.follow_up_date }})
+    <a href="{{ url_for('edit_application', app_id=a.id) }}">Edit</a>
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}
+
+<h2>Your applications</h2>
+<form method="GET">
+  <input type="text" name="q" value="{{ q }}" placeholder="Search company or role">
+  <select name="status">
+    <option value="">All statuses</option>
+    {% for s in statuses %}
+      <option {% if s == selected_status %}selected{% endif %}>{{ s }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit">Filter</button>
+  <a href="{{ url_for('dashboard') }}">Clear</a>
+</form>
+
 {% if applications %}
 <table border="1" cellpadding="6">
   <tr>
@@ -14,17 +45,17 @@
     <th>Follow up</th>
     <th>Actions</th>
   </tr>
-  {% for app in applications %}
+  {% for a in applications %}
   <tr>
-    <td>{{ app.company }}</td>
-    <td>{{ app.role }}</td>
-    <td>{{ app.status }}</td>
-    <td>{{ app.applied_date }}</td>
-    <td>{{ app.follow_up_date or "-" }}</td>
+    <td>{{ a.company }}</td>
+    <td>{{ a.role }}</td>
+    <td>{{ a.status }}</td>
+    <td>{{ a.applied_date }}</td>
+    <td>{{ a.follow_up_date or "-" }}</td>
     <td>
-      <a href="{{ url_for('edit_application', app_id=app.id) }}">Edit</a>
-      <form method="POST" action="{{ url_for('delete_application', app_id=app.id) }}" style="display:inline"
-            onsubmit="return confirm('Delete this application?');">
+      <a href="{{ url_for('edit_application', app_id=a.id) }}">Edit</a>
+      <form method="POST" action="{{ url_for('delete_application', app_id=a.id) }}"
+            style="display:inline" onsubmit="return confirm('Delete this application?');">
         <button type="submit">Delete</button>
       </form>
     </td>
@@ -32,6 +63,6 @@
   {% endfor %}
 </table>
 {% else %}
-<p>No applications yet. Add your first one!</p>
+<p>No applications found.</p>
 {% endif %}
 {% endblock %}
