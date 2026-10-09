@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template, request, redirect, url_for, flash, abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import (
@@ -8,8 +9,13 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, date
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = "change-this-later"
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///tracker.db"
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-only-key")
+
+db_url = os.environ.get("DATABASE_URL", "sqlite:///tracker.db")
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
+app.config["SQLALCHEMY_DATABASE_URI"] = db_url
+
 
 db = SQLAlchemy(app)
 
