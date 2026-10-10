@@ -1,12 +1,22 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Job Tracker</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-  <h1>Job Application Tracker</h1>
-  <p>Coming soon.</p>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Job Application Tracker</h1>
+<p>Keep all your job applications in one place. Track the company, role, status, and follow-up dates, so no opportunity slips away.</p>
+
+{% if current_user.is_authenticated %}
+  <p><a href="{{ url_for('dashboard') }}"><button type="button">Go to dashboard</button></a></p>
+{% else %}
+  <p>
+    <a href="{{ url_for('register') }}"><button type="button">Get started</button></a>
+    <a href="{{ url_for('login') }}">I already have an account</a>
+  </p>
+{% endif %}
+
+<div class="cards">
+  <div class="card"><div class="label">Track every application</div></div>
+  <div class="card"><div class="label">Status summary</div></div>
+  <div class="card"><div class="label">Follow-up reminders</div></div>
+  <div class="card"><div class="label">Private to your account</div></div>
+</div>
+{% endblock %}
